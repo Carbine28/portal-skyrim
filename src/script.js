@@ -221,7 +221,7 @@ window.addEventListener('mousemove', (_event) => {
 
 
 let currentIntersectTarget = null;
-window.addEventListener('click', () => {
+window.addEventListener('mousedown', () => {
     if(currentIntersectTarget)
     {
         handleTransition();
@@ -318,6 +318,7 @@ const handleTransition = () => {
     enterSound.play();
     // Fade into black using overlay
     gsap.to(overlayMaterial.uniforms.uAlpha, {duration: 3.5, value: 1});
+    gui.hide();
     // window.setTimeout(() => {
         
     // })
