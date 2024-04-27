@@ -17,9 +17,9 @@ import { gsap } from "gsap";
 const deviceChecker = new DeviceChecker();
 let guiWidth = 400;
 if(deviceChecker.isMobile)
-    guiWidth = 200;
+    guiWidth = 350;
 const gui = new dat.GUI({
-    width: 400
+    width: guiWidth,
 })
 const debugObject = {
     clearColor: '#151519',
