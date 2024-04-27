@@ -37,6 +37,8 @@ const debugObject = {
   portalAdditiveSpeed: 0.00,
 };
 
+// load everything first?
+
 
 
 const init = () => 
@@ -281,7 +283,7 @@ const overlayMaterial = new THREE.ShaderMaterial({
   
   // Sounds
   const handleTransition = () => {
-    ambientSound.stop;
+    ambientSound.stop();
     enterSound.play();
     // Fade into black using overlay
     gsap.to(overlayMaterial.uniforms.uAlpha, {duration: 3.5, value: 1});
@@ -297,11 +299,16 @@ const overlayMaterial = new THREE.ShaderMaterial({
   const handlePointer = (_event ) => {
     mouse.x = _event.clientX / sizes.width * 2 - 1;
     mouse.y = - (_event.clientY / sizes.height * 2 - 1);
+
     raycaster.setFromCamera(mouse, camera);
     const intersect = raycaster.intersectObject(raycasterTargetObject);
     if(intersect.length && gui._closed)
     {
         handleTransition();
+    }
+    else if(_event.target.className === 'webgl')
+    {
+      gui.close();
     }
   }
 
@@ -372,10 +379,10 @@ controls.enableDamping = true
   tick()
 }
 
-init();
-// const startButton = document.getElementById('startButton');
-// startButton.addEventListener( 'click', () => {
-//   console.log('Starting experience');
-//   init(); 
-//   startButton.style.display = 'none';
-// }) 
+// init();
+const startButton = document.getElementById('startButton');
+startButton.addEventListener( 'click', () => {
+  console.log('Starting experience');
+  init(); 
+  startButton.style.display = 'none';
+}) 
