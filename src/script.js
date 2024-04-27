@@ -9,10 +9,7 @@ import portalVertexShader from './shader/portal/portal.vs'
 import portalFragmentShader from './shader/portal/portal.fs'
 
 import { gsap } from "gsap";
-import { DeviceChecker } from './utilities/deviceChecker'
 
-const deviceChecker = new DeviceChecker();
-console.log(deviceChecker.isMobile());
 /**
  * Base
  */
@@ -236,10 +233,7 @@ const fireRay = (_event) => {
     }
 }
 
-if(!deviceChecker.isMobile())
-    window.addEventListener('mousedown', fireRay)
-else
-    window.addEventListener('touchstart', fireRay)
+window.addEventListener('pointerdown', fireRay)
 
 /**
  * Camera
