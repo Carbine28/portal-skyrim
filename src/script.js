@@ -9,7 +9,10 @@ import portalVertexShader from './shader/portal/portal.vs'
 import portalFragmentShader from './shader/portal/portal.fs'
 
 import { gsap } from "gsap";
+import { DeviceChecker } from './utilities/deviceChecker'
 
+const deviceChecker = new DeviceChecker();
+console.log(deviceChecker.isMobile());
 /**
  * Base
  */
@@ -221,13 +224,22 @@ window.addEventListener('mousemove', (_event) => {
 
 
 let currentIntersectTarget = null;
-window.addEventListener('mousedown', () => {
-    if(currentIntersectTarget)
+
+const fireRay = (_event) => {
+    mouse.x = _event.clientX / sizes.width * 2 - 1;
+    mouse.y = - (_event.clientY / sizes.height * 2 - 1);
+    raycaster.setFromCamera(mouse, camera);
+    const intersect = raycaster.intersectObject(raycasterTargetObject);
+    if(intersect.length)
     {
         handleTransition();
     }
-})
+}
 
+if(!deviceChecker.isMobile())
+    window.addEventListener('mousedown', fireRay)
+else
+    window.addEventListener('touchstart', fireRay)
 
 /**
  * Camera
@@ -265,6 +277,8 @@ mesh.position.set(0., .8, -1.8);
 mesh.visible = false;
 scene.add( mesh );
 mesh.add(sound);
+
+const raycasterTargetObject = mesh;
 
 const enterSound = new THREE.PositionalAudio( listener );
 audioLoader.load(
@@ -350,23 +364,10 @@ renderer.setClearColor(debugObject.clearColor);
  * Animate
  */
 const clock = new THREE.Clock()
-const raycasterTargetObject = mesh;
 
 const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
-
-    raycaster.setFromCamera(mouse, camera);
-    
-    const intersect = raycaster.intersectObject(raycasterTargetObject)
-    if(intersect.length)
-    {
-        currentIntersectTarget = intersect[0];
-    }
-    else
-    {
-        currentIntersectTarget = null;
-    }
 
 
     firefliesMaterial.uniforms.uTime.value = elapsedTime;
