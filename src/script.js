@@ -250,7 +250,7 @@ camera.add(listener);
 const sound = new THREE.PositionalAudio( listener );
 const audioLoader = new THREE.AudioLoader();
 audioLoader.load(
-    'audio/portal.mp3',
+    'audio/portal.aac',
     (buffer) => {
         sound.setBuffer(buffer);
         sound.setRefDistance(1.5);
@@ -275,7 +275,7 @@ const raycasterTargetObject = mesh;
 
 const enterSound = new THREE.PositionalAudio( listener );
 audioLoader.load(
-    'audio/PortalEnter.mp3',
+    'audio/PortalEnter.aac',
     (buffer) => {
         enterSound.setBuffer(buffer);
         enterSound.setRefDistance(1.5);
