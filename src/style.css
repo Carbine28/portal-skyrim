@@ -9,9 +9,31 @@ body
 {
     overflow: hidden;
     background-color: grey;
-    cursor: pointer;
 }
 
+
+.startButton-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-style: dotted;
+    background-color: black;
+}
+
+#startButton {
+    display: block;
+    padding: 16px;
+    min-width: 88px;
+    background-color: beige;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 18px;
+    font-family: Arial, Helvetica, sans-serif;
+    cursor: pointer;
+}
 
 .video-container {
     display: none;
@@ -19,7 +41,7 @@ body
 
 .webgl
 {
-    /* display: none; */
+    display: none;
     position: fixed;
     top: 0;
     left: 0;

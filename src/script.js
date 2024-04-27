@@ -91,18 +91,6 @@ gltfLoader.load(
     'mergedPortal.glb',
     (gltf) => 
     {
-        // Old method, not efficient since we will only have one child after blender optimisaiton using JOINS ctrl + J
-        // gltf.scene.traverse(child => {
-        //     // if(child.name === 'Cube011' || child.name === 'Cube014' || child.name === 'Circle')
-        //     // {
-        //     //     child.material = lampMaterial;
-        //     //     return;
-        //     // }
-        //     // else
-        //     // {
-        //     child.material = bakedMaterial;
-        //     // }
-        // })
         const bakedMesh = gltf.scene.children.find(child => child.name === 'Cube056') // Should change to Baked name in blender tbh.
         bakedMesh.material = bakedMaterial;
         // or you can use, this is probably faster and more readible
@@ -286,7 +274,7 @@ const videoGeometry = new THREE.PlaneGeometry(2,2, 1, 1);
 const videoMesh = new THREE.Mesh(videoGeometry, videoMaterial);
 scene.add(videoMesh);
 
-
+gui.close();
 let sounds = [];
 const handleTransition = () => {
     sounds[1].stop;
