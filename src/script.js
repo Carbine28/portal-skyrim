@@ -224,10 +224,6 @@ window.addEventListener('mousemove', (_event) => {
 })
 
 
-let currentIntersectTarget = null;
-
-
-
 /**
  * Camera
  */
@@ -240,26 +236,7 @@ scene.add(camera)
 
 
 // 
-const sounds = [];
-let firstInteraction = true;
 
-// Portal Audio 
-const listener = new THREE.AudioListener();
-camera.add(listener);
-
-const sound = new THREE.PositionalAudio( listener );
-const audioLoader = new THREE.AudioLoader();
-audioLoader.load(
-    'audio/portal.aac',
-    (buffer) => {
-        sound.setBuffer(buffer);
-        sound.setRefDistance(1.5);
-        sound.loop = true;
-        sound.setVolume(0.1);
-        // sound.play();
-        sounds.push(sound);
-    }
-)
 
 // create an object for the sound to play from
 const boxGeometry = new THREE.BoxGeometry(1,1,1);
@@ -269,20 +246,11 @@ mesh.scale.set(1.4,1.4,.2);
 mesh.position.set(0., .8, -1.8);
 mesh.visible = false;
 scene.add( mesh );
-mesh.add(sound);
+
 
 const raycasterTargetObject = mesh;
 
-const enterSound = new THREE.PositionalAudio( listener );
-audioLoader.load(
-    'audio/PortalEnter.aac',
-    (buffer) => {
-        enterSound.setBuffer(buffer);
-        enterSound.setRefDistance(1.5);
-        sound.loop = false;
-        enterSound.setVolume(0.1);
-    }
-)
+
 
 const video = document.getElementById('video');
 video.volume = 0.2;
@@ -319,10 +287,11 @@ const videoMesh = new THREE.Mesh(videoGeometry, videoMaterial);
 scene.add(videoMesh);
 
 
+let sounds = [];
 const handleTransition = () => {
-    sound.stop();
-    enterSound.volume = 0.2;
-    enterSound.play();
+    sounds[1].stop;
+    sounds[0].volume = 0.2;
+    sounds[0].play();
     // Fade into black using overlay
     gsap.to(overlayMaterial.uniforms.uAlpha, {duration: 3.5, value: 1});
     gui.hide();
@@ -337,14 +306,47 @@ const handleTransition = () => {
     }, 5000  )
 }
 
-
+let firstInteraction = true;
 const handlePointer = (_event) => {
     if(firstInteraction)
     {
-        for(const sound of sounds)
-        {
-            sound.play();
-        }
+        // Portal Audio 
+        const listener = new THREE.AudioListener();
+        camera.add(listener);
+
+        const sound = new THREE.PositionalAudio( listener );
+        const audioLoader = new THREE.AudioLoader();
+        audioLoader.load(
+            'audio/portal.aac',
+            (buffer) => {
+                sound.setBuffer(buffer);
+                sound.setRefDistance(1.5);
+                sound.loop = true;
+                sound.setVolume(0.1);
+                // sound.play();
+                mesh.add(sound);
+                sound.play();
+                sounds.push(sound);
+            }
+        )
+        
+        const enterSound = new THREE.PositionalAudio( listener );
+        audioLoader.load(
+            'audio/PortalEnter.aac',
+            (buffer) => {
+                enterSound.setBuffer(buffer);
+                enterSound.setRefDistance(1.5);
+                sound.loop = false;
+                enterSound.setVolume(0.1);
+                mesh.add(enterSound);
+                sounds.push(enterSound);
+            }
+        )
+        // This doenst work anymore
+        // for(const sound of sounds)
+        // {
+        //     sound.play();
+        // }
         firstInteraction = false;
         return;
     }
