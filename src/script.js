@@ -7,13 +7,17 @@ import firefliesVertexShader from './shader/fireflies/fireflies.vs'
 import firefliesFragmentShader from './shader/fireflies/fireflies.fs'
 import portalVertexShader from './shader/portal/portal.vs'
 import portalFragmentShader from './shader/portal/portal.fs'
-
+import { DeviceChecker } from './utilities/deviceChecker';
 import { gsap } from "gsap";
 
 /**
  * Base
  */
 // Debug
+const deviceChecker = new DeviceChecker();
+let guiWidth = 400;
+if(deviceChecker.isMobile)
+    guiWidth = 200;
 const gui = new dat.GUI({
     width: 400
 })
@@ -23,7 +27,7 @@ const debugObject = {
     portalInnerColor: '#160a29',
 };
 
-gui.addColor(debugObject, 'clearColor').onChange(() => {
+gui.addColor(debugObject, 'clearColor').name('Background Color').onChange(() => {
     renderer.setClearColor(debugObject.clearColor);
 });
 
@@ -222,18 +226,7 @@ window.addEventListener('mousemove', (_event) => {
 
 let currentIntersectTarget = null;
 
-const fireRay = (_event) => {
-    mouse.x = _event.clientX / sizes.width * 2 - 1;
-    mouse.y = - (_event.clientY / sizes.height * 2 - 1);
-    raycaster.setFromCamera(mouse, camera);
-    const intersect = raycaster.intersectObject(raycasterTargetObject);
-    if(intersect.length)
-    {
-        handleTransition();
-    }
-}
 
-window.addEventListener('pointerdown', fireRay)
 
 /**
  * Camera
@@ -244,6 +237,11 @@ camera.position.x = 2.3
 camera.position.y = 2.6
 camera.position.z = 4
 scene.add(camera)
+
+
+// 
+const sounds = [];
+let firstInteraction = true;
 
 // Portal Audio 
 const listener = new THREE.AudioListener();
@@ -258,7 +256,8 @@ audioLoader.load(
         sound.setRefDistance(1.5);
         sound.loop = true;
         sound.setVolume(0.1);
-        sound.play();
+        // sound.play();
+        sounds.push(sound);
     }
 )
 
@@ -337,6 +336,29 @@ const handleTransition = () => {
         video.play();
     }, 5000  )
 }
+
+
+const handlePointer = (_event) => {
+    if(firstInteraction)
+    {
+        for(const sound of sounds)
+        {
+            sound.play();
+        }
+        firstInteraction = false;
+        return;
+    }
+    mouse.x = _event.clientX / sizes.width * 2 - 1;
+    mouse.y = - (_event.clientY / sizes.height * 2 - 1);
+    raycaster.setFromCamera(mouse, camera);
+    const intersect = raycaster.intersectObject(raycasterTargetObject);
+    if(intersect.length)
+    {
+        handleTransition();
+    }
+}
+
+window.addEventListener('pointerdown', handlePointer)
 
 
 // Controls
