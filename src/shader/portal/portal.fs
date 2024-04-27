@@ -81,11 +81,17 @@ float cnoise(vec3 P){
 
 void main() {
   vec2 displacedUv = vUv + cnoise(vec3(vec2(vUv * 4.0), uTime * 0.1));
+  // float warpStrength = step(0.2, uWarpSpeed);
+  displacedUv.x += cos(displacedUv.x * uWarpSpeed * 10.0);
+  displacedUv.y += sin(displacedUv.y * uWarpSpeed * 10.0);
+  
   float strength = cnoise(vec3(displacedUv.x * 5.0, displacedUv.y * 5.0, uTime * 0.3));
   float outerGlow = distance(vUv, vec2(0.5)) * 5. - 1.5;
+
   strength += outerGlow;
   strength = strength + step( - 0.2, strength) * 0.8;
   strength = clamp(strength, 0.0, 1.0); // Clamp to prevent strengh so mix of colours instead of further mixing
   vec3 color = mix(uColorInner, uColorOuter , strength);
+
   gl_FragColor = vec4( vec3(color), 1.0);
 }

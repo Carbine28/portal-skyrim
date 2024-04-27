@@ -186,13 +186,13 @@ const overlayMaterial = new THREE.ShaderMaterial({
       // Update anythign that uses screen 
       firefliesMaterial.uniforms.uPixelRatio.value = Math.min(window.devicePixelRatio, 2)
     })
-
-  
     window.addEventListener('mousemove', (_event) => {
       mouse.x = _event.clientX / sizes.width * 2 - 1; // divide to get 0 -> 1, * by 2 to get 0 - > 2, then -1 to shift left 1
       mouse.y = - (_event.clientY / sizes.height * 2 - 1);
     })
   }
+
+  setupEventListeners();
 
   /**
    * Camera
@@ -365,7 +365,7 @@ controls.enableDamping = true
 
     firefliesMaterial.uniforms.uTime.value = elapsedTime;
     portalLightMaterial.uniforms.uTime.value = elapsedTime;
-    portalLightMaterial.uniforms.uWarpSpeed.value += debugObject.portalAdditiveSpeed;
+    portalLightMaterial.uniforms.uWarpSpeed.value = debugObject.portalAdditiveSpeed;
     // Update controls
     controls.update()
 
