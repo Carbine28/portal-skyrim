@@ -1,6 +1,7 @@
 uniform float uTime;
 uniform vec3 uColorInner;
 uniform vec3 uColorOuter;
+uniform float uWarpSpeed;
 varying vec2 vUv;
 
 //	Classic Perlin 3D Noise 

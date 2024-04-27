@@ -34,6 +34,7 @@ const debugObject = {
   clearColor: '#151519',
   portalOuterColor: '#720ced',
   portalInnerColor: '#160a29',
+  portalAdditiveSpeed: 0.00,
 };
 
 
@@ -68,6 +69,7 @@ const init = () =>
       uTime: { value: 0 },
       uColorOuter: {value: new THREE.Color('#7714f0')},
       uColorInner: {value: new THREE.Color('#160a29')},
+      uWarpSpeed: { value: 0.0}
     },
     vertexShader: portalVertexShader,
     fragmentShader: portalFragmentShader,
@@ -297,7 +299,7 @@ const overlayMaterial = new THREE.ShaderMaterial({
     mouse.y = - (_event.clientY / sizes.height * 2 - 1);
     raycaster.setFromCamera(mouse, camera);
     const intersect = raycaster.intersectObject(raycasterTargetObject);
-    if(intersect.length)
+    if(intersect.length && gui._closed)
     {
         handleTransition();
     }
@@ -328,17 +330,19 @@ controls.enableDamping = true
     });
     // Portal
     const portalFolder = gui.addFolder('Portal Folder');
-    portalFolder.addColor(debugObject, 'portalOuterColor')
+    portalFolder.addColor(debugObject, 'portalOuterColor').name("Portal Outer Color")
         .onChange(() => {
             portalLightMaterial.uniforms.uColorOuter.value.set(debugObject.portalOuterColor);
         })
-    portalFolder.addColor(debugObject, 'portalInnerColor')
+    portalFolder.addColor(debugObject, 'portalInnerColor') .name("Portal Inner Color")
     .onChange(() => {
         portalLightMaterial.uniforms.uColorInner.value.set( debugObject.portalInnerColor);
     })
     // Fire Flies 
     const firefliesFolder = gui.addFolder('Fire Flies')
     firefliesFolder.add(firefliesMaterial.uniforms.uSize, 'value').min(0).max(500.0).step(1).name('FIreflies size')
+
+    gui.add(debugObject, 'portalAdditiveSpeed').min(0.0).max(1.0).step(0.001).name('Warp Speed');
     gui.close();
   }
   debugObjectInit();
@@ -346,7 +350,7 @@ controls.enableDamping = true
  * Animate
  */
   clock = new THREE.Clock()
-
+  
   const tick = () =>
   {
     const elapsedTime = clock.getElapsedTime()
@@ -354,6 +358,7 @@ controls.enableDamping = true
 
     firefliesMaterial.uniforms.uTime.value = elapsedTime;
     portalLightMaterial.uniforms.uTime.value = elapsedTime;
+    portalLightMaterial.uniforms.uWarpSpeed.value += debugObject.portalAdditiveSpeed;
     // Update controls
     controls.update()
 
@@ -367,10 +372,10 @@ controls.enableDamping = true
   tick()
 }
 
-
-const startButton = document.getElementById('startButton');
-startButton.addEventListener( 'click', () => {
-  console.log('Starting experience');
-  init(); 
-  startButton.style.display = 'none';
-}) 
+init();
+// const startButton = document.getElementById('startButton');
+// startButton.addEventListener( 'click', () => {
+//   console.log('Starting experience');
+//   init(); 
+//   startButton.style.display = 'none';
+// }) 
