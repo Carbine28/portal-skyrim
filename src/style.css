@@ -19,7 +19,6 @@ body
     display: flex;
     justify-content: center;
     align-items: center;
-    border-style: dotted;
     background-color: black;
 }
 
@@ -28,7 +27,9 @@ body
     padding: 16px;
     min-width: 88px;
     background-color: beige;
-    border-radius: 6px;
+    border-radius: 10px;
+
+    color: black ;
     font-weight: 700;
     font-size: 18px;
     font-family: Arial, Helvetica, sans-serif;

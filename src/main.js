@@ -214,7 +214,7 @@ const overlayMaterial = new THREE.ShaderMaterial({
   const raycaster = new THREE.Raycaster();
 
   const video = document.getElementById('video');
-  video.volume = 0.2;
+  video.volume = 0.5;
 
   const videoTexture = new THREE.VideoTexture( video );
   const videoMaterial = new THREE.ShaderMaterial(
@@ -259,7 +259,7 @@ const overlayMaterial = new THREE.ShaderMaterial({
         ambientSound.setBuffer(buffer);
         ambientSound.setRefDistance(1.5);
         ambientSound.loop = true;
-        ambientSound.setVolume(0.3);
+        ambientSound.setVolume(0.5);
         mesh.add(ambientSound);
         ambientSound.play();
       }
@@ -272,7 +272,7 @@ const overlayMaterial = new THREE.ShaderMaterial({
           enterSound.setBuffer(buffer);
           enterSound.setRefDistance(1.5);
           enterSound.loop = false;
-          enterSound.setVolume(0.5);
+          enterSound.setVolume(0.45);
           mesh.add(enterSound);
       }
   )
