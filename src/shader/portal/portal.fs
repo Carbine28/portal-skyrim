@@ -1,6 +1,9 @@
 uniform float uTime;
 uniform vec3 uColorInner;
 uniform vec3 uColorOuter;
+uniform vec3 uFinalInnerColor;
+uniform vec3 uFinalOuterColor;
+uniform float uTransitionStrength; // clamp this from  0 - 1
 uniform float uWarpSpeed;
 varying vec2 vUv;
 
@@ -91,7 +94,11 @@ void main() {
   strength += outerGlow;
   strength = strength + step( - 0.2, strength) * 0.8;
   strength = clamp(strength, 0.0, 1.0); // Clamp to prevent strengh so mix of colours instead of further mixing
-  vec3 color = mix(uColorInner, uColorOuter , strength);
+
+  vec3 outerColor = mix(uColorOuter, uFinalOuterColor, uTransitionStrength);
+  vec3 innerColor = mix(uColorInner, uFinalInnerColor, uTransitionStrength);
+
+  vec3 color = mix(innerColor, outerColor , strength);
 
   gl_FragColor = vec4( vec3(color), 1.0);
 }

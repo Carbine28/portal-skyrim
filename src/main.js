@@ -11,7 +11,7 @@ import { DeviceChecker } from './utilities/deviceChecker';
 import { gsap } from "gsap";
 
 let scene, camera, renderer, clock;
-
+let gltfScene;
 
 let gui = null;
 let guiWidth = 400;
@@ -71,6 +71,9 @@ const init = () =>
       uTime: { value: 0 },
       uColorOuter: {value: new THREE.Color('#7714f0')},
       uColorInner: {value: new THREE.Color('#160a29')},
+      uFinalOuterColor: { value: new THREE.Color('#17ee74') },
+      uFinalInnerColor: { value: new THREE.Color('#20642c') },
+      uTransitionStrength: { value: 0},
       uWarpSpeed: { value: 0.0}
     },
     vertexShader: portalVertexShader,
@@ -95,11 +98,12 @@ const init = () =>
       const lamp1Mesh = gltf.scene.children.find(child => child.name === 'Cube011');
       const lamp2Mesh = gltf.scene.children.find(child => child.name === 'Cube014');
       const portalMesh = gltf.scene.children.find(child => child.name === 'Circle');
-
+      
       lamp1Mesh.material = lampMaterial;
       lamp2Mesh.material = lampMaterial;
       portalMesh.material = portalLightMaterial;
-
+      
+      gltfScene = gltf.scene;
       scene.add(gltf.scene);
     }
   )
@@ -283,14 +287,31 @@ const overlayMaterial = new THREE.ShaderMaterial({
   
   // Sounds
   const handleTransition = () => {
+    controls.enabled = false; // disable orbit controls to prevent bug of passing the video plane and making it invisible
+    window.removeEventListener('pointerdown', handlePointer); // Remove so it cannot trigger another interaction
     ambientSound.stop();
     enterSound.play();
+    // Portal Colour change effect
+    tween = gsap.to(portalLightMaterial.uniforms.uTransitionStrength, {duration: 2.5, value: 1, ease: 'power1.out'} );
+    mesh.position.y += 0.1;
+    controls.target = mesh.position;
+    // Zoom
+    gsap.to(controls, {
+      maxDistance: 1.0,
+      duration: 2.0,
+      overwrite: 'auto',
+    })
     // Fade into black using overlay
-    gsap.to(overlayMaterial.uniforms.uAlpha, {duration: 3.5, value: 1});
+    gsap.to(overlayMaterial.uniforms.uAlpha, {duration: 4.3, value: 1, ease: 'power1.in', overwrite: 'auto'});
     gui.hide();
+    
     // Fade out from black using videoMaterial and play video
     window.setTimeout(() => {
-        videoMaterial.uniforms.uOpacity.value = 1.0;
+      overlayMaterial.uniforms.uAlpha = 1;
+      scene.remove(gltfScene);
+      scene.remove(mesh);
+      
+      videoMaterial.uniforms.uOpacity.value = 1.0;
         scene.remove(overlay);
         video.play();
     }, 5000  )
@@ -316,8 +337,9 @@ const overlayMaterial = new THREE.ShaderMaterial({
 
   // Controls
 const controls = new OrbitControls(camera, canvas)
+controls.maxDistance = 10;
 controls.enableDamping = true
-
+controls.saveState();
   /**
    * Renderer
    */
@@ -350,22 +372,48 @@ controls.enableDamping = true
     firefliesFolder.add(firefliesMaterial.uniforms.uSize, 'value').min(0).max(500.0).step(1).name('FIreflies size')
 
     gui.add(debugObject, 'portalAdditiveSpeed').min(0.0).max(1.0).step(0.001).name('Warp Speed');
-    gui.close();
+    // gui.close();
   }
   debugObjectInit();
   /**
  * Animate
  */
   clock = new THREE.Clock()
-  
+  let prevTime = 0;
+  let tween = null;
+  debugObject.isTransitioning = false;
+  gui.add(debugObject, 'isTransitioning').onChange(() => {
+    if(debugObject.isTransitioning)
+    {
+      tween = gsap.to(portalLightMaterial.uniforms.uTransitionStrength, {duration: 2, value: 1} );
+      portalLightMaterial.uniforms.uTransitionStrength.value = 1;
+      controls.target = mesh.position;
+      gsap.to(controls, {
+        maxDistance: 1.0,
+        duration: 1.5,
+        overwrite: 'auto',
+      })
+    }
+    else
+    {
+      if(tween != null)
+      {
+        tween.kill();
+      }
+      portalLightMaterial.uniforms.uTransitionStrength.value = 0;
+      controls.reset();
+    }
+  });
   const tick = () =>
   {
-    const elapsedTime = clock.getElapsedTime()
-
+    const elapsedTime = clock.getElapsedTime() // Time in seconds
+    const deltaTime = elapsedTime - prevTime; // Change in time between current time and last frame time
+    prevTime = deltaTime;
 
     firefliesMaterial.uniforms.uTime.value = elapsedTime;
     portalLightMaterial.uniforms.uTime.value = elapsedTime;
     portalLightMaterial.uniforms.uWarpSpeed.value = debugObject.portalAdditiveSpeed;
+
     // Update controls
     controls.update()
 
