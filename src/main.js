@@ -202,11 +202,16 @@ const overlayMaterial = new THREE.ShaderMaterial({
    * Camera
    */
   // Base camera
+  
   camera = new THREE.PerspectiveCamera(45, sizes.width / sizes.height, 0.1, 100)
   camera.position.x = 2.3
   camera.position.y = 2.6
   camera.position.z = 4
   scene.add(camera)
+
+  let currentCamera = camera;
+
+  const transitionCamera = new THREE.OrthographicCamera(- 1, 1, 1, - 1, 0, 1);
   
   // create an object for the sound to play from
   const boxGeometry = new THREE.BoxGeometry(1,1,1);
@@ -220,39 +225,6 @@ const overlayMaterial = new THREE.ShaderMaterial({
   // Ray casting
   const raycasterTargetObject = mesh;
   const raycaster = new THREE.Raycaster();
-
-  video.volume = 0.5;
-
-  const videoTexture = new THREE.VideoTexture( video );
-  const videoMaterial = new THREE.ShaderMaterial(
-      {
-          uniforms: {
-              uVideoTexture: { value: videoTexture},
-              uOpacity: {value: 0.0}
-          },
-          vertexShader: 
-          `
-              varying vec2 vUv;
-              void main() {
-                  gl_Position = vec4(position, 1.0);
-                  vUv = uv;
-              }
-          `,
-          fragmentShader: 
-          `
-              uniform sampler2D uVideoTexture;
-              uniform float uOpacity;
-              varying vec2 vUv;
-              void main() {
-                  vec4 finalColor = texture2D(uVideoTexture, vUv);
-                  gl_FragColor = vec4(vec3(finalColor.xyz), uOpacity);
-              }
-          `,
-          transparent: true,
-      });
-  const videoGeometry = new THREE.PlaneGeometry(2,2, 1, 1);
-  const videoMesh = new THREE.Mesh(videoGeometry, videoMaterial);
-  scene.add(videoMesh);
 
   // Portal Audio 
   const listener = new THREE.AudioListener();
@@ -286,6 +258,8 @@ const overlayMaterial = new THREE.ShaderMaterial({
   
   // Sounds
   const handleTransition = () => {
+    camera.position.set(0.08747708758627344,  0.44209001524914743, 2.839451149344242) 
+    controls.update();
     controls.enabled = false; // disable orbit controls to prevent bug of passing the video plane and making it invisible
     window.removeEventListener('pointerdown', handlePointer); // Remove so it cannot trigger another interaction
     ambientSound.stop();
@@ -304,10 +278,13 @@ const overlayMaterial = new THREE.ShaderMaterial({
     })
     // Zoom
     gsap.to(controls, {
-      maxDistance: .50,
+      maxDistance: .60,
       duration: 2.0,
       ease: 'power1.inout',
       overwrite: 'auto',
+      onComplete: () => {
+        // controls.enabled = false;
+      }
     })
     // Fade into black using overlay
     gsap.to(overlayMaterial.uniforms.uAlpha, {duration: 4.3, value: 1, ease: 'power1.in', overwrite: 'auto'});
@@ -315,13 +292,15 @@ const overlayMaterial = new THREE.ShaderMaterial({
     
     // Fade out from black using videoMaterial and play video
     window.setTimeout(() => {
-      overlayMaterial.uniforms.uAlpha = 1;
+      // overlayMaterial.uniforms.uAlpha = 1;
+      currentCamera = transitionCamera;
+      scene.remove(camera);
       scene.remove(gltfScene);
       scene.remove(mesh);
-      
+      scene.remove(fireflies);
       videoMaterial.uniforms.uOpacity.value = 1.0;
-        scene.remove(overlay);
-        video.play();
+      video.play();
+      scene.remove(overlay);
     }, 5000  )
   }
 
@@ -393,6 +372,7 @@ controls.saveState();
   gui.add(debugObject, 'isTransitioning').onChange(() => {
     if(debugObject.isTransitioning)
     {
+      videoMaterial.uniforms.uOpacity.value = 1.0;
       tween = gsap.to(portalLightMaterial.uniforms.uTransitionStrength, {duration: 2, value: 1} );
       portalLightMaterial.uniforms.uTransitionStrength.value = 1;
       controls.target = mesh.position;
@@ -413,6 +393,41 @@ controls.saveState();
       controls.reset();
     }
   });
+
+  
+  video.volume = 0.5;
+  const videoTexture = new THREE.VideoTexture( video );
+  const videoMaterial = new THREE.ShaderMaterial(
+      {
+          uniforms: {
+              uVideoTexture: { value: videoTexture},
+              uOpacity: {value: 0.0}
+          },
+          vertexShader: 
+          `
+              varying vec2 vUv;
+              void main() {
+                  gl_Position = vec4(position, 1.0);
+                  vUv = uv;
+              }
+          `,
+          fragmentShader: 
+          `
+              uniform sampler2D uVideoTexture;
+              uniform float uOpacity;
+              varying vec2 vUv;
+              void main() {
+                  vec4 finalColor = texture2D(uVideoTexture, vUv);
+                  gl_FragColor = vec4(vec3(finalColor.xyz), uOpacity);
+              }
+          `,
+          transparent: true,
+      });
+  videoMaterial.render
+  const videoGeometry = new THREE.PlaneGeometry(2,2);
+  const videoMesh = new THREE.Mesh(videoGeometry, videoMaterial);
+  scene.add(videoMesh);
+
   const tick = () =>
   {
     const elapsedTime = clock.getElapsedTime() // Time in seconds
@@ -422,12 +437,13 @@ controls.saveState();
     firefliesMaterial.uniforms.uTime.value = elapsedTime;
     portalLightMaterial.uniforms.uTime.value = elapsedTime;
     portalLightMaterial.uniforms.uWarpSpeed.value = debugObject.portalAdditiveSpeed;
-    overlay.lookAt(camera);
+    // console.log(camera.position);
     // Update controls
     controls.update()
-
+    // 
+// Vector3 {x: 0.08747708758627344, y: 0.44209001524914743, z: 2.839451149344242}
     // Render
-    renderer.render(scene, camera)
+    renderer.render(scene, currentCamera)
 
     // Call tick again on the next frame
     window.requestAnimationFrame(tick)

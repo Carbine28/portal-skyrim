@@ -38,6 +38,7 @@ body
 
 .video-container {
     display: none;
+    z-index: 1000;
 }
 
 .webgl
