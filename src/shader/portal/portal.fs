@@ -86,8 +86,8 @@ void main() {
   // [UV Stuff]
   vec2 displacedUv = vUv + cnoise(vec3(vec2(vUv * 4.0), uTime * 0.1));
   // float warpStrength = step(0.2, uWarpSpeed);
-  displacedUv.x += cos(displacedUv.x * uWarpSpeed * 10.0);
-  displacedUv.y += sin(displacedUv.y * uWarpSpeed * 10.0);
+  displacedUv.x += cos(displacedUv.x * uWarpSpeed * 50.0);
+  displacedUv.y += sin(displacedUv.y * uWarpSpeed * 50.0); 
   
   float strength = cnoise(vec3(displacedUv.x * 5.0, displacedUv.y * 5.0, uTime * 0.3));
   float outerGlow = distance(vUv, vec2(0.5)) * 5. - 1.5;

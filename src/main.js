@@ -46,7 +46,7 @@ const init = () =>
   gui = new dat.GUI({
     width: guiWidth,
   })
-  
+  gui.close();
   // Canvas
   const canvas = document.querySelector('canvas.webgl')
   canvas.style.display = 'block';
@@ -274,7 +274,7 @@ const overlayMaterial = new THREE.ShaderMaterial({
     // debugObject.portalAdditiveSpeed
     gsap.to(debugObject, {
       portalAdditiveSpeed: 1,
-      duration: 6,
+      duration: 5.4,
       ease: 'power1.out',
       overwrite: 'auto'
     })
@@ -374,16 +374,15 @@ controls.saveState();
   gui.add(debugObject, 'isTransitioning').onChange(() => {
     if(debugObject.isTransitioning)
     {
-      videoMaterial.uniforms.uOpacity.value = 1.0;
       tween = gsap.to(portalLightMaterial.uniforms.uTransitionStrength, {duration: 2, value: 1} );
       portalLightMaterial.uniforms.uTransitionStrength.value = 1;
-      controls.target = mesh.position;
-      gsap.to(controls, {
-        maxDistance: .5,
-        duration: 1.5,
-        overwrite: 'auto',
-      })
-      controls.update();
+      // controls.target = mesh.position;
+      // gsap.to(controls, {
+      //   maxDistance: .5,
+      //   duration: 1.5,
+      //   overwrite: 'auto',
+      // })
+      // controls.update();
     }
     else
     {
@@ -392,7 +391,6 @@ controls.saveState();
         tween.kill();
       }
       portalLightMaterial.uniforms.uTransitionStrength.value = 0;
-      controls.reset();
     }
   });
 
