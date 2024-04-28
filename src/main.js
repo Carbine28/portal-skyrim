@@ -12,7 +12,7 @@ import { gsap } from "gsap";
 
 let scene, camera, renderer, clock;
 let gltfScene;
-
+let video = document.getElementById('video');
 let gui = null;
 let guiWidth = 400;
 const deviceChecker = new DeviceChecker();
@@ -221,7 +221,6 @@ const overlayMaterial = new THREE.ShaderMaterial({
   const raycasterTargetObject = mesh;
   const raycaster = new THREE.Raycaster();
 
-  const video = document.getElementById('video');
   video.volume = 0.5;
 
   const videoTexture = new THREE.VideoTexture( video );
@@ -413,7 +412,7 @@ controls.saveState();
     firefliesMaterial.uniforms.uTime.value = elapsedTime;
     portalLightMaterial.uniforms.uTime.value = elapsedTime;
     portalLightMaterial.uniforms.uWarpSpeed.value = debugObject.portalAdditiveSpeed;
-
+    overlay.lookAt(camera);
     // Update controls
     controls.update()
 
