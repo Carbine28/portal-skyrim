@@ -294,10 +294,19 @@ const overlayMaterial = new THREE.ShaderMaterial({
     tween = gsap.to(portalLightMaterial.uniforms.uTransitionStrength, {duration: 2.5, value: 1, ease: 'power1.out'} );
     mesh.position.y += 0.1;
     controls.target = mesh.position;
+
+    // debugObject.portalAdditiveSpeed
+    gsap.to(debugObject, {
+      portalAdditiveSpeed: 1,
+      duration: 6,
+      ease: 'power1.out',
+      overwrite: 'auto'
+    })
     // Zoom
     gsap.to(controls, {
-      maxDistance: 1.0,
+      maxDistance: .50,
       duration: 2.0,
+      ease: 'power1.inout',
       overwrite: 'auto',
     })
     // Fade into black using overlay
@@ -388,10 +397,11 @@ controls.saveState();
       portalLightMaterial.uniforms.uTransitionStrength.value = 1;
       controls.target = mesh.position;
       gsap.to(controls, {
-        maxDistance: 1.0,
+        maxDistance: .5,
         duration: 1.5,
         overwrite: 'auto',
       })
+      controls.update();
     }
     else
     {
