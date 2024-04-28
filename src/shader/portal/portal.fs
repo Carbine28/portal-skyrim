@@ -83,6 +83,7 @@ float cnoise(vec3 P){
 }
 
 void main() {
+  // [UV Stuff]
   vec2 displacedUv = vUv + cnoise(vec3(vec2(vUv * 4.0), uTime * 0.1));
   // float warpStrength = step(0.2, uWarpSpeed);
   displacedUv.x += cos(displacedUv.x * uWarpSpeed * 10.0);
@@ -95,9 +96,9 @@ void main() {
   strength = strength + step( - 0.2, strength) * 0.8;
   strength = clamp(strength, 0.0, 1.0); // Clamp to prevent strengh so mix of colours instead of further mixing
 
+  // Transition [Colours]
   vec3 outerColor = mix(uColorOuter, uFinalOuterColor, uTransitionStrength);
   vec3 innerColor = mix(uColorInner, uFinalInnerColor, uTransitionStrength);
-
   vec3 color = mix(innerColor, outerColor , strength);
 
   gl_FragColor = vec4( vec3(color), 1.0);
