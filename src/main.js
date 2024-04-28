@@ -258,7 +258,9 @@ const overlayMaterial = new THREE.ShaderMaterial({
   
   // Sounds
   const handleTransition = () => {
-    camera.position.set(0.08747708758627344,  0.44209001524914743, 2.839451149344242) 
+    controls.enableDamping = false;     // Prevent past damping from being applied to new position and update
+    controls.update();
+    camera.position.set(0.08747708758627344,  0.44209001524914743, 2.839451149344242);  // Then apply new fixed* position
     controls.update();
     controls.enabled = false; // disable orbit controls to prevent bug of passing the video plane and making it invisible
     window.removeEventListener('pointerdown', handlePointer); // Remove so it cannot trigger another interaction
